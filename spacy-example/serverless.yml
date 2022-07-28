@@ -1,0 +1,57 @@
+service: ner-api
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  # REF: https://www.serverless.com/blog/container-support-for-lambda
+  ecr:
+    # In this section you can define images that will be built locally and uploaded to ECR
+    images:
+      appimage:
+        path: ./
+  apiGateway:
+    shouldStartNameWithService: true
+  lambdaHashingVersion: 20201221  
+  stage: dev
+  region: us-east-1
+  # REF: https://www.serverless.com/framework/docs/providers/aws/guide/layers/
+  #      https://towardsdatascience.com/quickstart-spacy-on-aws-lambda-up-and-running-in-10-minutes-e347037a0ef8
+  #layers:
+  #- arn:aws:lambda:us-east-1:770693421928:layer:Klayers-python38-spacy:41
+  #- arn:aws:lambda:us-east-1:770693421928:layer:Klayers-python38-spacy_model_en_small:1
+  iam:
+    role:
+      statements:
+      - Effect: 'Allow'
+        Action:
+          - 'lambda:InvokeFunction'
+        Resource: "*"
+
+functions:
+  recognize-named-entites:
+    image: 
+      name: appimage
+    memorySize: 1536
+    timeout: 30
+    events:
+      - http:
+          path: ner
+          method: post
+
+plugins:
+  - serverless-plugin-warmup
+  - serverless-api-gateway-throttling
+
+custom:    
+  # https://github.com/juanjoDiaz/serverless-plugin-warmup  
+  warmup:
+    twentyFourHoursWarmer:
+      enabled: true
+      events:
+        - schedule: cron(*/5 * ? * * *)
+      concurrency: 1
+  # https://github.com/DianaIonita/serverless-api-gateway-throttling
+  apiGatewayThrottling:
+    maxRequestsPerSecond: 1
+    maxConcurrentRequests: 1
