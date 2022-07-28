@@ -14,7 +14,7 @@ name: Deploy Dev
 on:
   push:
     branches:
-      - spacy
+      - main
 jobs:
   deploy-dev:
     runs-on: ubuntu-latest
