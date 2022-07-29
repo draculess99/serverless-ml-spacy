@@ -12,11 +12,9 @@
 
 name: Deploy Dev
 on:
-on:
-  pull_request:
   push:
     branches:
-      - main
+      - spacy
 jobs:
   deploy-dev:
     runs-on: ubuntu-latest
