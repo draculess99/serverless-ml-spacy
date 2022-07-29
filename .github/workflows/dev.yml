@@ -12,7 +12,6 @@
 
 name: Deploy Dev
 on:
-on:
   pull_request:
   push:
     branches:
